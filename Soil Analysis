@@ -1,0 +1,120 @@
+# Setup
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.linear_model import LinearRegression
+
+from sklearn.metrics import r2_score, mean_absolute_error
+
+metadata = pd.read_table('sample_metadata.tsv')
+metadata.index = ['farm_%i' % i for i in range(len(metadata))]
+
+bacteria_counts_lognorm = pd.read_csv('bacteria_counts_lognorm.csv', index_col=0)
+
+# Experimenting with diff models
+
+X = bacteria_counts_lognorm
+y = metadata['crop_yield']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+# DecisionTreeRegressor
+decision_tree_regressor = DecisionTreeRegressor(max_depth=100, max_leaf_nodes=200)
+
+decision_tree_regressor.fit(X_train, y_train)
+
+preds_dtr = decision_tree_regressor.predict(X_test)
+
+plt.plot(y_test, preds_dtr, '.')
+plt.title('Decision Tree Regressor')
+plt.xlabel('True crop yields')
+plt.ylabel('Predicted crop yields')
+plt.show()
+
+# LinearRegressor
+model = LinearRegression()
+
+model.fit(X_train, y_train)
+
+preds_linear = model.predict(X_test)
+
+plt.plot(y_test, preds_linear, '.')
+plt.title('Linear Regressor')
+plt.xlabel('True crop yields')
+plt.ylabel('Predicted crop yields')
+plt.show()
+
+# MLPRegressor
+mlp = MLPRegressor(hidden_layer_sizes=(100, 50), max_iter=1000, random_state=42)
+mlp.fit(X_train, y_train)
+preds_mlp = mlp.predict(X_test)
+
+plt.plot(y_test, preds_mlp, '.')
+plt.title('MLP Regressor')
+plt.xlabel('True crop yields')
+plt.ylabel('Predicted crop yields')
+plt.show()
+
+# KNeighborsRegressor
+knn = KNeighborsRegressor(n_neighbors=5)
+knn.fit(X_train, y_train)
+preds_knn = knn.predict(X_test)
+
+plt.plot(y_test, preds_knn, '.')
+plt.title('KNeighbor Regressor')
+plt.xlabel('True crop yields')
+plt.ylabel('Predicted crop yields')
+plt.show()
+
+# Evaluating regression models
+
+# 1. Coefficient of determination (R^2)
+# Decision tree regressor evaluation
+R2_dtr = r2_score(y_test, preds_dtr)
+
+# Linear regressor evaluation
+R2_linear = r2_score(y_test, preds_linear)
+
+# MLP regressor evaluation
+R2_mlp = r2_score(y_test, preds_linear)
+
+# KNeighbors regressor evaluation
+R2_knn = r2_score(y_test, preds_dtr)
+
+print('R2 decision tree regressor =', R2_dtr, 'R2 linear regressor =', R2_linear, 'R2 MLP regressor =', R2_mlp, 'R2 KNeighbors regressor =', R2_knn)
+
+# 2. Mean Absolute Error 
+# Decision tree regressor evaluation
+MAE_dtr = mean_absolute_error(y_test, preds_dtr)
+
+# Linear regressor evaluation
+MAE_linear = mean_absolute_error(y_test, preds_linear)
+
+# MLP regressor evaluation
+MAE_mlp = mean_absolute_error(y_test, preds_mlp)
+
+# KNeighbors regressor evaluation
+MAE_knn = mean_absolute_error(y_test, preds_linear)
+
+print('MAE dtr =', MAE_dtr, 'MAE linear =', MAE_linear, 'MAE MLP =', MAE_mlp, 'MAE knn =', MAE_knn)
+
+# 3. Relative Squared Error
+def relative_squared_error(true_vals, pred_vals):
+    total_squared_error = sum((pred_vals - true_vals) ** 2)
+    average_of_true_vals = true_vals.mean()
+    simple_preds = np.full_like(true_vals, fill_value=average_of_true_vals)
+    total_squared_error_simple_predictor = sum((simple_preds - true_vals) ** 2)
+    return total_squared_error / total_squared_error_simple_predictor
+
+rse_dtr = relative_squared_error(y_test.values, preds_dtr)
+rse_linear = relative_squared_error(y_test.values, preds_linear)
+rse_mlp = relative_squared_error(y_test.values, preds_mlp)
+rse_knn = relative_squared_error(y_test.values, preds_knn)
+
+print('rse_dtr =', rse_dtr, 'rse_linear =', rse_linear, 'rse_mlp =', rse_mlp, 'rse_knn =', rse_knn)
