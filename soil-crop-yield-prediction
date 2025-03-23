@@ -87,7 +87,7 @@ R2_mlp = r2_score(y_test, preds_linear)
 # KNeighbors regressor evaluation
 R2_knn = r2_score(y_test, preds_dtr)
 
-print('R2 decision tree regressor =', R2_dtr, 'R2 linear regressor =', R2_linear, 'R2 MLP regressor =', R2_mlp, 'R2 KNeighbors regressor =', R2_knn)
+print('r2_dtr =', R2_dtr, 'r2_linear =', R2_linear, 'r2_mlp =', R2_mlp, 'r2_knn =', R2_knn)
 
 # 2. Mean Absolute Error 
 # Decision tree regressor evaluation
@@ -102,7 +102,7 @@ MAE_mlp = mean_absolute_error(y_test, preds_mlp)
 # KNeighbors regressor evaluation
 MAE_knn = mean_absolute_error(y_test, preds_linear)
 
-print('MAE dtr =', MAE_dtr, 'MAE linear =', MAE_linear, 'MAE MLP =', MAE_mlp, 'MAE knn =', MAE_knn)
+print('mae_dtr =', MAE_dtr, 'mae_linear =', MAE_linear, 'mae_mlp =', MAE_mlp, 'mae_knn =', MAE_knn)
 
 # 3. Relative Squared Error
 def relative_squared_error(true_vals, pred_vals):
